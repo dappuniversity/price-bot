@@ -71,6 +71,22 @@ async function monitorPrice() {
       inputAmount: web3.utils.toWei('1', 'ETHER')
     })
 
+    await checkPair({
+      inputTokenSymbol: 'ETH',
+      inputTokenAddress: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+      outputTokenSymbol: 'WBTC',
+      outputTokenAddress: '0xC11b1268C1A384e55C48c2391d8d480264A3A7F4',
+      inputAmount: web3.utils.toWei('1', 'ETHER')
+    })
+
+    // await checkPair({
+    //   inputTokenSymbol: 'ETH',
+    //   inputTokenAddress: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+    //   outputTokenSymbol: 'DAI',
+    //   outputTokenAddress: '0x6b175474e89094c44da98b954eedeac495271d0f',
+    //   inputAmount: web3.utils.toWei('1', 'ETHER')
+    // })
+
   } catch (error) {
     console.error(error)
     monitoringPrice = false
