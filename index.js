@@ -63,6 +63,8 @@ async function monitorPrice() {
 
   try {
 
+    // ADD YOUR CUSTOM TOKEN PAIRS HERE!!!
+
     await checkPair({
       inputTokenSymbol: 'ETH',
       inputTokenAddress: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
@@ -74,18 +76,18 @@ async function monitorPrice() {
     await checkPair({
       inputTokenSymbol: 'ETH',
       inputTokenAddress: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
-      outputTokenSymbol: 'WBTC',
-      outputTokenAddress: '0xC11b1268C1A384e55C48c2391d8d480264A3A7F4',
+      outputTokenSymbol: 'KNC',
+      outputTokenAddress: '0xdd974d5c2e2928dea5f71b9825b8b646686bd200',
       inputAmount: web3.utils.toWei('1', 'ETHER')
     })
 
-    // await checkPair({
-    //   inputTokenSymbol: 'ETH',
-    //   inputTokenAddress: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
-    //   outputTokenSymbol: 'DAI',
-    //   outputTokenAddress: '0x6b175474e89094c44da98b954eedeac495271d0f',
-    //   inputAmount: web3.utils.toWei('1', 'ETHER')
-    // })
+    await checkPair({
+      inputTokenSymbol: 'ETH',
+      inputTokenAddress: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+      outputTokenSymbol: 'LINK',
+      outputTokenAddress: '0x514910771af9ca656af840dff83e8264ecf986ca',
+      inputAmount: web3.utils.toWei('1', 'ETHER')
+    })
 
   } catch (error) {
     console.error(error)
