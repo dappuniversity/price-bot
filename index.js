@@ -30,38 +30,46 @@ const KYBER_RATE_ABI = [{"constant":false,"inputs":[{"name":"alerter","type":"ad
 const KYBER_RATE_ADDRESS = '0x96b610046d63638d970e6243151311d8827d69a5'
 const kyberRateContract = new web3.eth.Contract(KYBER_RATE_ABI, KYBER_RATE_ADDRESS)
 
-// Minimum eth to swap
-const ETH_AMOUNT = web3.utils.toWei('1', 'Ether')
-console.log("Eth Amount", ETH_AMOUNT)
+async function checkPair(args) {
+  const { inputTokenSymbol, inputTokenAddress, outputTokenSymbol, outputTokenAddress, inputAmount } = args
+
+  const exchangeAddress = await uniswapFactoryContract.methods.getExchange(outputTokenAddress).call()
+  const exchangeContract = new web3.eth.Contract(UNISWAP_EXCHANGE_ABI, exchangeAddress)
+
+  const uniswapResult = await exchangeContract.methods.getEthToTokenInputPrice(inputAmount).call()
+  let kyberResult = await kyberRateContract.methods.getExpectedRate(inputTokenAddress, outputTokenAddress, inputAmount, true).call()
+
+  console.table([{
+    'Input Token': inputTokenSymbol,
+    'Output Token': outputTokenSymbol,
+    'Input Amount': web3.utils.fromWei(inputAmount, 'Ether'),
+    'Uniswap Return': web3.utils.fromWei(uniswapResult, 'Ether'),
+    'Kyber Expected Rate': web3.utils.fromWei(kyberResult.expectedRate, 'Ether'),
+    'Kyber Min Return': web3.utils.fromWei(kyberResult.slippageRate, 'Ether'),
+    'Timestamp': moment().tz('America/Chicago').format(),
+  }])
+}
 
 let priceMonitor
 let monitoringPrice = false
-
-// TODO: Add better API call here...
-async function checkPair(args) {
-    const exchangeAddress = await uniswapFactoryContract.methods.getExchange('0x6b175474e89094c44da98b954eedeac495271d0f').call()
-    const exchangeContract = new web3.eth.Contract(UNISWAP_EXCHANGE_ABI, exchangeAddress)
-
-    // Check Eth Price
-    const daiAmount = await exchangeContract.methods.getEthToTokenInputPrice(ETH_AMOUNT).call()
-    const price = web3.utils.fromWei(daiAmount.toString(), 'Ether')
-    console.log('Eth Price:', price, ' DAI')
-
-    let result = await kyberRateContract.methods.getExpectedRate('0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', '0x6b175474e89094c44da98b954eedeac495271d0f', ETH_AMOUNT, true).call()
-    console.log(web3.utils.fromWei(result.expectedRate, 'Ether'), web3.utils.fromWei(result.slippageRate, 'Ether')) // min rate
-}
 
 async function monitorPrice() {
   if(monitoringPrice) {
     return
   }
 
-  console.log("Checking price...")
+  console.log("Checking prices...")
   monitoringPrice = true
 
   try {
 
-    await checkPair()
+    await checkPair({
+      inputTokenSymbol: 'ETH',
+      inputTokenAddress: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+      outputTokenSymbol: 'DAI',
+      outputTokenAddress: '0x6b175474e89094c44da98b954eedeac495271d0f',
+      inputAmount: web3.utils.toWei('1', 'ETHER')
+    })
 
   } catch (error) {
     console.error(error)
@@ -74,5 +82,5 @@ async function monitorPrice() {
 }
 
 // Check markets every n seconds
-const POLLING_INTERVAL = process.env.POLLING_INTERVAL || 1000 // 1 Second
+const POLLING_INTERVAL = process.env.POLLING_INTERVAL || 3000 // 3 Seconds
 priceMonitor = setInterval(async () => { await monitorPrice() }, POLLING_INTERVAL)
