@@ -37,16 +37,8 @@ console.log("Eth Amount", ETH_AMOUNT)
 let priceMonitor
 let monitoringPrice = false
 
-async function monitorPrice() {
-  if(monitoringPrice) {
-    return
-  }
-
-  console.log("Checking price...")
-  monitoringPrice = true
-
-  try {
-
+// TODO: Add better API call here...
+async function checkPair(args) {
     const exchangeAddress = await uniswapFactoryContract.methods.getExchange('0x6b175474e89094c44da98b954eedeac495271d0f').call()
     const exchangeContract = new web3.eth.Contract(UNISWAP_EXCHANGE_ABI, exchangeAddress)
 
@@ -57,6 +49,19 @@ async function monitorPrice() {
 
     let result = await kyberRateContract.methods.getExpectedRate('0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', '0x6b175474e89094c44da98b954eedeac495271d0f', ETH_AMOUNT, true).call()
     console.log(web3.utils.fromWei(result.expectedRate, 'Ether'), web3.utils.fromWei(result.slippageRate, 'Ether')) // min rate
+}
+
+async function monitorPrice() {
+  if(monitoringPrice) {
+    return
+  }
+
+  console.log("Checking price...")
+  monitoringPrice = true
+
+  try {
+
+    await checkPair()
 
   } catch (error) {
     console.error(error)
