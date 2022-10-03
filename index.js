@@ -63,6 +63,7 @@ async function monitorPrice() {
 
   try {
 
+<<<<<<< HEAD
     const exchangeAddress = await uniswapFactoryContract.methods.getExchange('0x6b175474e89094c44da98b954eedeac495271d0f').call()
     const exchangeContract = new web3.eth.Contract(UNISWAP_EXCHANGE_ABI, exchangeAddress)
 
@@ -70,6 +71,17 @@ async function monitorPrice() {
     const daiAmount = await exchangeContract.methods.getEthToTokenInputPrice(ETH_AMOUNT).call()
     const price = web3.utils.fromWei(daiAmount.toString(), 'Ether')
     console.log('Eth Price:', price, ' DAI')
+=======
+    // ADD YOUR CUSTOM TOKEN PAIRS HERE!!!
+
+    await checkPair({
+      inputTokenSymbol: 'ETH',
+      inputTokenAddress: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+      outputTokenSymbol: 'MKR',
+      outputTokenAddress: '0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2',
+      inputAmount: web3.utils.toWei('1', 'ETHER')
+    })
+>>>>>>> fcd767358a147d2450983899541d322b4c3a37d8
 
     await checkPair({
       inputTokenSymbol: 'ETH',
