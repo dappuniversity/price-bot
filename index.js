@@ -15,7 +15,7 @@ const app = express();
 const server = http.createServer(app).listen(PORT, () => console.log(`Listening on ${ PORT }`))
 
 // WEB3 CONFIG
-const web3 = new Web3(new HDWalletProvider(process.env.PRIVATE_KEY, process.env.RPC_URL) )
+const web3 = new Web3(process.env.RPC_URL)
 
 // Uniswap Factory Contract: https://etherscan.io/address/0xc0a47dfe034b400b47bdad5fecda2621de6c4d95#code
 const UNISWAP_FACTORY_ABI = [{"name":"NewExchange","inputs":[{"type":"address","name":"token","indexed":true},{"type":"address","name":"exchange","indexed":true}],"anonymous":false,"type":"event"},{"name":"initializeFactory","outputs":[],"inputs":[{"type":"address","name":"template"}],"constant":false,"payable":false,"type":"function","gas":35725},{"name":"createExchange","outputs":[{"type":"address","name":"out"}],"inputs":[{"type":"address","name":"token"}],"constant":false,"payable":false,"type":"function","gas":187911},{"name":"getExchange","outputs":[{"type":"address","name":"out"}],"inputs":[{"type":"address","name":"token"}],"constant":true,"payable":false,"type":"function","gas":715},{"name":"getToken","outputs":[{"type":"address","name":"out"}],"inputs":[{"type":"address","name":"exchange"}],"constant":true,"payable":false,"type":"function","gas":745},{"name":"getTokenWithId","outputs":[{"type":"address","name":"out"}],"inputs":[{"type":"uint256","name":"token_id"}],"constant":true,"payable":false,"type":"function","gas":736},{"name":"exchangeTemplate","outputs":[{"type":"address","name":"out"}],"inputs":[],"constant":true,"payable":false,"type":"function","gas":633},{"name":"tokenCount","outputs":[{"type":"uint256","name":"out"}],"inputs":[],"constant":true,"payable":false,"type":"function","gas":663}]
@@ -58,10 +58,18 @@ async function monitorPrice() {
     return
   }
 
-  console.log("Checking prices...")
+  console.log("Checking price...")
   monitoringPrice = true
 
   try {
+
+    const exchangeAddress = await uniswapFactoryContract.methods.getExchange('0x6b175474e89094c44da98b954eedeac495271d0f').call()
+    const exchangeContract = new web3.eth.Contract(UNISWAP_EXCHANGE_ABI, exchangeAddress)
+
+    // Check Eth Price
+    const daiAmount = await exchangeContract.methods.getEthToTokenInputPrice(ETH_AMOUNT).call()
+    const price = web3.utils.fromWei(daiAmount.toString(), 'Ether')
+    console.log('Eth Price:', price, ' DAI')
 
     await checkPair({
       inputTokenSymbol: 'ETH',
@@ -74,18 +82,18 @@ async function monitorPrice() {
     await checkPair({
       inputTokenSymbol: 'ETH',
       inputTokenAddress: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
-      outputTokenSymbol: 'WBTC',
-      outputTokenAddress: '0xC11b1268C1A384e55C48c2391d8d480264A3A7F4',
+      outputTokenSymbol: 'KNC',
+      outputTokenAddress: '0xdd974d5c2e2928dea5f71b9825b8b646686bd200',
       inputAmount: web3.utils.toWei('1', 'ETHER')
     })
 
-    // await checkPair({
-    //   inputTokenSymbol: 'ETH',
-    //   inputTokenAddress: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
-    //   outputTokenSymbol: 'DAI',
-    //   outputTokenAddress: '0x6b175474e89094c44da98b954eedeac495271d0f',
-    //   inputAmount: web3.utils.toWei('1', 'ETHER')
-    // })
+    await checkPair({
+      inputTokenSymbol: 'ETH',
+      inputTokenAddress: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+      outputTokenSymbol: 'LINK',
+      outputTokenAddress: '0x514910771af9ca656af840dff83e8264ecf986ca',
+      inputAmount: web3.utils.toWei('1', 'ETHER')
+    })
 
   } catch (error) {
     console.error(error)
@@ -98,5 +106,5 @@ async function monitorPrice() {
 }
 
 // Check markets every n seconds
-const POLLING_INTERVAL = process.env.POLLING_INTERVAL || 3000 // 3 Seconds
+const POLLING_INTERVAL = process.env.POLLING_INTERVAL || 1000 // 1 Second
 priceMonitor = setInterval(async () => { await monitorPrice() }, POLLING_INTERVAL)
