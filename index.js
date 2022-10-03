@@ -58,20 +58,11 @@ async function monitorPrice() {
     return
   }
 
-  console.log("Checking price...")
+  console.log("Checking prices...")
   monitoringPrice = true
 
   try {
 
-<<<<<<< HEAD
-    const exchangeAddress = await uniswapFactoryContract.methods.getExchange('0x6b175474e89094c44da98b954eedeac495271d0f').call()
-    const exchangeContract = new web3.eth.Contract(UNISWAP_EXCHANGE_ABI, exchangeAddress)
-
-    // Check Eth Price
-    const daiAmount = await exchangeContract.methods.getEthToTokenInputPrice(ETH_AMOUNT).call()
-    const price = web3.utils.fromWei(daiAmount.toString(), 'Ether')
-    console.log('Eth Price:', price, ' DAI')
-=======
     // ADD YOUR CUSTOM TOKEN PAIRS HERE!!!
 
     await checkPair({
@@ -81,7 +72,6 @@ async function monitorPrice() {
       outputTokenAddress: '0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2',
       inputAmount: web3.utils.toWei('1', 'ETHER')
     })
->>>>>>> fcd767358a147d2450983899541d322b4c3a37d8
 
     await checkPair({
       inputTokenSymbol: 'ETH',
@@ -118,5 +108,5 @@ async function monitorPrice() {
 }
 
 // Check markets every n seconds
-const POLLING_INTERVAL = process.env.POLLING_INTERVAL || 1000 // 1 Second
+const POLLING_INTERVAL = process.env.POLLING_INTERVAL || 3000 // 3 Seconds
 priceMonitor = setInterval(async () => { await monitorPrice() }, POLLING_INTERVAL)
