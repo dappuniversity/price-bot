@@ -26,5 +26,7 @@
   "devDependencies": {
     "request": "^2.81.0"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "keywords": [],
+  "author": ""
 }
